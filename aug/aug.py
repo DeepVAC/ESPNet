@@ -3,14 +3,6 @@ import torch
 import random
 import cv2
 
-
-#============================================
-__author__ = "Sachin Mehta"
-__license__ = "MIT"
-__maintainer__ = "Sachin Mehta"
-#============================================
-
-
 class Scale(object):
     """
     Randomly crop and resize the given PIL image with a probability of 0.5
