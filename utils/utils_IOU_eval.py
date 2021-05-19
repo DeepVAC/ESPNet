@@ -1,6 +1,6 @@
 import numpy as np
 
-class iouEval:
+class IOUEval:
     def __init__(self, nClasses):
         self.nClasses = nClasses
         self.reset()

@@ -8,13 +8,14 @@ import time
 import numpy as np
 import os
 
+# import deepvac
 import sys
-import deepvac
+sys.path.insert(0, '/opt/public/airlock/lihang/deepvac')
 from deepvac import LOG, DeepvacTrain
-
+from deepvac.experimental.core import DeepvacDistill
 from utils.utils_IOU_eval import IOUEval
 
-class ESPNetTrain(DeepvacTrain):
+class ESPNetTrain(DeepvacDistill):
     def __init__(self, deepvac_config):
         super(ESPNetTrain, self).__init__(deepvac_config)
         self.config.save_flag = False
@@ -46,7 +47,7 @@ class ESPNetTrain(DeepvacTrain):
     def postEpoch(self):
         if not self.config.save_flag:
             return
-        average_epoch_loss = sum(self.config.epoch_loss) / len(self.config.epoch_loss)
+        average_epoch_loss = sum(self.config.epoch_loss) / len(self.epoch_loss)
 
         if self.config.phase == 'TRAIN':
             overall_acc, per_class_acc, per_class_iu, mIOU = self.iou_eval_train.getMetric()
@@ -64,7 +65,18 @@ class ESPNetTrain(DeepvacTrain):
         if not self.config.is_train:
             return
         loss1, loss2 = self.config.criterion(self.config.output[0], self.config.target), self.config.criterion(self.config.output[1], self.config.target)
+        loss3, loss4 = self.config.criterion(self.config.teacher.output[0], self.config.target), self.config.criterion(self.config.teacher.output[1], self.config.target)
         self.config.loss = loss1 + loss2
+        self.config.teacher.loss = loss3 + loss4
+        LOG.logI('loss1: {}, loss2: {}, loss3: {}, loss4: {}'.format(loss1, loss2, loss3, loss4))
+
+    def doOptimize(self):
+        super(DeepvacDistill, self).doOptimize()
+        if self.config.iter % self.config.nominal_batch_factor != 0:
+            return
+        self.config.teacher.optimizer.step()
+        self.config.teacher.optimizer.zero_grad()
+
 
 if __name__ == "__main__":
     from config import config

@@ -3,159 +3,79 @@ import torch
 import random
 import cv2
 
-class Scale(object):
-    """
-    Randomly crop and resize the given PIL image with a probability of 0.5
-    """
-    def __init__(self, wi, he):
-        '''
+from torchvision import transforms
 
-        :param wi: width after resizing
-        :param he: height after reszing
-        '''
-        self.w = wi
-        self.h = he
+from deepvac.aug.base_aug import AugBase
+from deepvac.aug.factory import AugFactory
+from deepvac.aug import Composer, PickOneComposer
+from config import config
 
-    def __call__(self, img, label):
-        '''
-        :param img: RGB image
-        :param label: semantic label image
-        :return: resized images
-        '''
-        #bilinear interpolation for RGB image
-        img = cv2.resize(img, (self.w, self.h))
-        # nearest neighbour interpolation for label image
-        label = cv2.resize(label, (self.w, self.h), interpolation=cv2.INTER_NEAREST)
+class ESPNetAugFactory(AugFactory):
+    def initProducts(self):
+        super(ESPNetAugFactory, self).initProducts()
+        aug_name = 'ESPNetMainComposer'
+        self.addProduct(aug_name, eval(aug_name) )
+    
+class ESPNetMainComposer(PickOneComposer):
+    def __init__(self, deepvac_config):
+        self.config = deepvac_config
+        super(ESPNetMainComposer, self).__init__(deepvac_config)
 
-        return [img, label]
+        ac1 = ESPNetAugFactory('ImageWithMasksNormalizeAug => ImageWithMasksRandomCropResizeAug => ImageWithMasksHFlipAug@0.5 => ImageWithMasksToTensorAug', deepvac_config)
+        ac2 = ESPNetAugFactory('ImageWithMasksNormalizeAug => ImageWithMasksRandomCropResizeAug => ImageWithMasksVFlipAug@0.5 => ImageWithMasksToTensorAug', deepvac_config)
 
+        self.addAugFactory('ac1', ac1, 0.5)
+        self.addAugFactory('ac1', ac2, 0.5)
 
+class ESPNetScale1Composer(PickOneComposer):
+    def __init__(self, deepvac_config):
+        self.config = deepvac_config
+        super(ESPNetScale1Composer, self).__init__(deepvac_config)
 
-class RandomCropResize(object):
-    """
-    Randomly crop and resize the given PIL image with a probability of 0.5
-    """
-    def __init__(self, size):
-        '''
-        :param crop_area: area to be cropped (this is the max value and we select between o and crop area
-        '''
-        self.size = size
+        ac1 = ESPNetAugFactory('ImageWithMasksNormalizeAug => ImageWithMasksRandomCropResizeAug => ImageWithMasksHFlipAug@0.5 => ImageWithMasksToTensorAug', deepvac_config)
+        ac2 = ESPNetAugFactory('ImageWithMasksNormalizeAug => ImageWithMasksRandomCropResizeAug => ImageWithMasksVFlipAug@0.5 => ImageWithMasksToTensorAug', deepvac_config)
 
-    def __call__(self, img, label):
-        h, w = img.shape[:2]
-        x1 = random.randint(0, int(w*0.1)) # 25% to 10%
-        y1 = random.randint(0, int(h*0.1))
+        self.addAugFactory('ac1', ac1, 0.5)
+        self.addAugFactory('ac1', ac2, 0.5)
 
-        img_crop = img[y1:h-y1, x1:w-x1]
-        label_crop = label[y1:h-y1, x1:w-x1]
+class ESPNetScale2Composer(PickOneComposer):
+    def __init__(self, deepvac_config):
+        self.config = deepvac_config
+        super(ESPNetScale2Composer, self).__init__(deepvac_config)
 
-        img_crop = cv2.resize(img_crop, self.size)
-        label_crop = cv2.resize(label_crop, self.size, interpolation=cv2.INTER_NEAREST)
+        ac1 = ESPNetAugFactory('ImageWithMasksNormalizeAug => ImageWithMasksRandomCropResizeAug => ImageWithMasksHFlipAug@0.5 => ImageWithMasksToTensorAug', deepvac_config)
+        ac2 = ESPNetAugFactory('ImageWithMasksNormalizeAug => ImageWithMasksRandomCropResizeAug => ImageWithMasksVFlipAug@0.5 => ImageWithMasksToTensorAug', deepvac_config)
 
-        '''
-        img_resize = cv2.resize(img, self.size)
-        label_resize = cv2.resize(label, self.size, interpolation=cv2.INTER_NEAREST)
+        self.addAugFactory('ac1', ac1, 0.5)
+        self.addAugFactory('ac1', ac2, 0.5)
 
-        x1 = random.randint(0, self.size[0]-384)
-        y1 = random.randint(0, self.size[1]-384)
-        img_crop = img_resize[y1:y1+384, x1:x1+384]
-        label_crop = label_resize[y1:y1+384, x1:x1+384]
-        '''
-        return img_crop, label_crop
+class ESPNetScale3Composer(PickOneComposer):
+    def __init__(self, deepvac_config):
+        self.config = deepvac_config
+        super(ESPNetScale3Composer, self).__init__(deepvac_config)
 
-class RandomCrop(object):
-    '''
-    This class if for random cropping
-    '''
-    def __init__(self, cropArea):
-        '''
-        :param cropArea: amount of cropping (in pixels)
-        '''
-        self.crop = cropArea
+        ac1 = ESPNetAugFactory('ImageWithMasksNormalizeAug => ImageWithMasksRandomCropResizeAug => ImageWithMasksHFlipAug@0.5 => ImageWithMasksToTensorAug', deepvac_config)
+        ac2 = ESPNetAugFactory('ImageWithMasksNormalizeAug => ImageWithMasksRandomCropResizeAug => ImageWithMasksVFlipAug@0.5 => ImageWithMasksToTensorAug', deepvac_config)
 
-    def __call__(self, img, label):
+        self.addAugFactory('ac1', ac1, 0.5)
+        self.addAugFactory('ac1', ac2, 0.5)
 
-        if random.random() < 0.5:
-            h, w = img.shape[:2]
-            img_crop = img[self.crop:h-self.crop, self.crop:w-self.crop]
-            label_crop = label[self.crop:h-self.crop, self.crop:w-self.crop]
-            return img_crop, label_crop
-        else:
-            return [img, label]
+class ESPNetScale4Composer(PickOneComposer):
+    def __init__(self, deepvac_config):
+        self.config = deepvac_config
+        super(ESPNetScale4Composer, self).__init__(deepvac_config)
 
+        ac1 = ESPNetAugFactory('ImageWithMasksNormalizeAug => ImageWithMasksRandomCropResizeAug => ImageWithMasksHFlipAug@0.5 => ImageWithMasksToTensorAug', deepvac_config)
+        ac2 = ESPNetAugFactory('ImageWithMasksNormalizeAug => ImageWithMasksRandomCropResizeAug => ImageWithMasksVFlipAug@0.5 => ImageWithMasksToTensorAug', deepvac_config)
 
+        self.addAugFactory('ac1', ac1, 0.5)
+        self.addAugFactory('ac1', ac2, 0.5)
 
-class RandomFlip(object):
-    """Randomly horizontally flips the given PIL.Image with a probability of 0.5
-    """
+class ESPNetValComposer(Composer):
+    def __init__(self, deepvac_config):
+        self.config = deepvac_config
+        super(ESPNetValComposer, self).__init__(deepvac_config)
 
-    def __call__(self, image, label):
-        if random.random() < 0.5:
-            x1 = random.randint(0, 1) #if you want to do vertical flip, uncomment this line
-            if x1 == 0:
-                image = cv2.flip(image, 0) # horizontal flip
-                label = cv2.flip(label, 0) # horizontal flip
-            else:
-                image = cv2.flip(image, 1) # veritcal flip
-                label = cv2.flip(label, 1)  # veritcal flip
-        return [image, label]
+        ac1 = ESPNetAugFactory('ImageWithMasksNormalizeAug => ImageWithMasksScaleAug => ImageWithMasksToTensorAug', deepvac_config)
 
-
-class Normalize(object):
-    """Given mean: (R, G, B) and std: (R, G, B),
-    will normalize each channel of the torch.*Tensor, i.e.
-    channel = (channel - mean) / std
-    """
-
-    def __init__(self, mean, std):
-        '''
-        :param mean: global mean computed from dataset
-        :param std: global std computed from dataset
-        '''
-        self.mean = mean
-        self.std = std
-
-    def __call__(self, image, label):
-        image = image.astype(np.float32)
-        for i in range(3):
-            image[:,:,i] -= self.mean[i]
-        for i in range(3):
-            image[:,:, i] /= self.std[i]
-
-        return [image, label]
-
-class ToTensor(object):
-    '''
-    This class converts the data to tensor so that it can be processed by PyTorch
-    '''
-    def __init__(self, scale=1):
-        '''
-        :param scale: ESPNet-C's output is 1/8th of original image size, so set this parameter accordingly
-        '''
-        self.scale = scale # original images are 2048 x 1024
-
-    def __call__(self, image, label):
-
-        if self.scale != 1:
-            h, w = label.shape[:2]
-            image = cv2.resize(image, (int(w), int(h)))
-            label = cv2.resize(label, (int(w/self.scale), int(h/self.scale)), interpolation=cv2.INTER_NEAREST)
-
-        image = image.transpose((2,0,1))
-
-        image_tensor = torch.from_numpy(image).div(255)
-        label_tensor =  torch.LongTensor(np.array(label, dtype=np.int)) #torch.from_numpy(label)
-
-        return [image_tensor, label_tensor]
-
-class Compose(object):
-    """Composes several transforms together.
-    """
-
-    def __init__(self, transforms):
-        self.transforms = transforms
-
-    def __call__(self, *args):
-        for t in self.transforms:
-            args = t(*args)
-        return args
+        self.addAugFactory('ac1', ac1, 1)
