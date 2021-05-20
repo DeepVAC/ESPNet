@@ -8,9 +8,7 @@ import time
 import numpy as np
 import os
 
-# import deepvac
-import sys
-sys.path.insert(0, '/opt/public/airlock/lihang/deepvac')
+import deepvac
 from deepvac import LOG, DeepvacTrain
 from deepvac.experimental.core import DeepvacDistill
 from utils.utils_IOU_eval import IOUEval
