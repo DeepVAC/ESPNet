@@ -1,19 +1,14 @@
-import pickle
 import os
+import pickle
 import numpy as np
 import cv2
-
-
 from deepvac import LOG
 from deepvac.datasets import FileLineCvSegDataset
 
 class FileLineCvSegWithMetaInfoDataset(FileLineCvSegDataset):
 
-    def __init__(self, deepvac_config):
-        print('debug: ', deepvac_config)
-        super(FileLineCvSegWithMetaInfoDataset, self).__init__(deepvac_config, deepvac_config.datasets.FileLineCvSegWithMetaInfoDataset.fileline_path, ',', 
-                                                                deepvac_config.datasets.FileLineCvSegWithMetaInfoDataset.sample_path_prefix)
-        
+    def __init__(self, deepvac_config, fileline_path, sample_path_prefix):
+        super(FileLineCvSegWithMetaInfoDataset, self).__init__(deepvac_config,fileline_path, ',', sample_path_prefix)
         self.classes = self.config.classes
         self.classWeights = np.ones(self.classes, dtype=np.float32)
         self.normVal = self.config.norm_val

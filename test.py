@@ -1,11 +1,10 @@
-import torch
-import torch.nn.functional as F
-
+import sys
+import os
+import time
 import cv2
 import numpy as np
-import time
-import os
-
+import torch
+import torch.nn.functional as F
 import deepvac
 from deepvac import LOG, Deepvac
 
@@ -47,10 +46,10 @@ def getFileList(input_dir):
 
 if __name__ == "__main__":
     from config import config
-   
+
     espnet_test = ESPNetTest(config)
 
-    files = getFileList('/gemfield/hostpv2/liyang/Data/std-images/val/images')
+    files = getFileList('your test images path')
     for f in files:
         input_tensor = espnet_test.pre_process(f)
         espnet_test(input_tensor)
