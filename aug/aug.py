@@ -1,15 +1,13 @@
-import numpy as np
-import torch
 import random
 import cv2
-
+import numpy as np
+import torch
 from torchvision import transforms
-
 from deepvac.aug.base_aug import AugBase
 from deepvac.aug.factory import AugFactory
 from deepvac.aug import Composer, PickOneComposer
 from config import config
-    
+
 class ESPNetMainComposer(PickOneComposer):
     def __init__(self, deepvac_config):
         self.config = deepvac_config
