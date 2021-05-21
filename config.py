@@ -33,14 +33,15 @@ config.core.batch_size = 16
 config.core.model_path = "your model path"
 
 ## -------------------- tensorboard ------------------
-config.core.tensorboard_port = "6007"
-config.core.tensorboard_ip = None
+# config.core.tensorboard_port = "6007"
+# config.core.tensorboard_ip = None
 
 
 ## -------------------- script and quantize ------------------
-#config.core.trace_model_dir = "./trace.pt"
-#config.core.static_quantize_dir = "./script.sq"
-#config.core.dynamic_quantize_dir = "./quantize.sq"
+#config.cast.TraceCast = AttrDict()
+#config.cast.TraceCast.model_dir = "./script.pt"
+#config.cast.TraceCast.static_quantize_dir = "./script.sq"
+# config.cast.TraceCast.dynamic_quantize_dir = "./quantize.sq"
 
 config.sample_path_prefix = './data'
 
@@ -82,8 +83,10 @@ config.aug.ImageWithMasksNormalizeAug.std = config.data['std']
 config.aug.ImageWithMasksToTensorAug = AttrDict()
 config.aug.ImageWithMasksToTensorAug.scale = 1
 
-config.aug.ImageWithMasksRandomCropResizeAug = AttrDict()
-config.aug.ImageWithMasksRandomCropResizeAug.size = (int(1.0*384), int(1.0*384))
+config.aug.ImageWithMasksRandomRotateAug = AttrDict()
+config.aug.ImageWithMasksRandomRotateAug.max_angle = 45
+config.aug.ImageWithMasksRandomRotateAug.fill_color = True
+
 
 config.aug.ImageWithMasksScaleAug = AttrDict()
 config.aug.ImageWithMasksScaleAug.w = 384
@@ -115,28 +118,32 @@ last_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(config, './
 last_train_loader.is_last_loader = True
 
 scale1_config = fork(config)
-scale1_config.aug.ImageWithMasksRandomCropResizeAug.size = (int(1.25*384), int(1.25*384))
+scale1_config.aug.ImageWithMasksScaleAug.w = 384 * 1.25
+scale1_config.aug.ImageWithMasksScaleAug.h = 384 * 1.25
 scale1_config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(scale1_config)
 scale1_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(scale1_config, './data/train.txt', ',', config.sample_path_prefix),
     batch_size=config.core.batch_size, shuffle=True, num_workers=config.core.num_workers, pin_memory=True)
 scale1_train_loader.is_last_loader = False
 
 scale2_config = fork(config)
-scale2_config.aug.ImageWithMasksRandomCropResizeAug.size = (int(1.5*384), int(1.5*384))
+scale2_config.aug.ImageWithMasksScaleAug.w = 384 * 1.5
+scale2_config.aug.ImageWithMasksScaleAug.h = 384 * 1.5
 scale2_config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(scale2_config)
 scale2_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(scale2_config, './data/train.txt', ',', config.sample_path_prefix),
     batch_size=config.core.batch_size, shuffle=True, num_workers=config.core.num_workers, pin_memory=True)
 scale2_train_loader.is_last_loader = False
 
 scale3_config = fork(config)
-scale3_config.aug.ImageWithMasksRandomCropResizeAug.size = (int(1.75*384), int(1.75*384))
+scale3_config.aug.ImageWithMasksScaleAug.w = 384 * 1.75
+scale3_config.aug.ImageWithMasksScaleAug.h = 384 * 1.75
 scale3_config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(scale3_config)
 scale3_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(scale3_config, './data/train.txt', ',', config.sample_path_prefix),
     batch_size=config.core.batch_size, shuffle=True, num_workers=config.core.num_workers, pin_memory=True)
 scale3_train_loader.is_last_loader = False
 
 scale4_config = fork(config)
-scale4_config.aug.ImageWithMasksRandomCropResizeAug.size = (int(2.0*384), int(2.0*384))
+scale4_config.aug.ImageWithMasksScaleAug.w = 384 * 2.0
+scale4_config.aug.ImageWithMasksScaleAug.h = 384 * 2.0
 scale4_config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(scale4_config)
 scale4_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(scale4_config, './data/train.txt', ',', config.sample_path_prefix),
     batch_size=config.core.batch_size, shuffle=True, num_workers=config.core.num_workers, pin_memory=True)
