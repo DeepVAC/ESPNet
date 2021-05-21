@@ -89,7 +89,7 @@ config.aug.ImageWithMasksScaleAug.h = 384
 
 config.datasets.FileLineCvSegDataset = AttrDict()
 #just for fool deepvac
-config.datasets.FileLineCvSegDataset.composer = ESPNetMainComposer(config)
+config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(config)
 config.core.train_dataset = FileLineCvSegDataset(config, './data/train.txt', ',')
 config.core.train_loader = torch.utils.data.DataLoader(config.core.train_dataset, batch_size=config.core.batch_size, shuffle=True, num_workers=config.core.num_workers, pin_memory=True)
 config.core.train_loader.is_last_loader = False
@@ -107,7 +107,7 @@ config.core.test_loader = torch.utils.data.DataLoader(config.core.test_dataset, 
 # config.dist_url = 'tcp://localhost:27030'
 # config.world_size = 2
 
-config.datasets.FileLineCvSegDataset.composer = ESPNetMainComposer(config)
+config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(config)
 last_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(config, './data/train.txt', ','),
     batch_size=config.core.batch_size, shuffle=True, num_workers=config.core.num_workers, pin_memory=True)
 last_train_loader.is_last_loader = True
@@ -121,28 +121,28 @@ def fork(deepvac_config):
 
 scale1_config = fork(config)
 scale1_config.aug.ImageWithMasksRandomCropResizeAug.size = (int(1.25*384), int(1.25*384))
-scale1_config.datasets.FileLineCvSegDataset.composer = ESPNetScale1Composer(scale1_config)
+scale1_config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(scale1_config)
 scale1_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(scale1_config, './data/train.txt', ','),
     batch_size=config.core.batch_size, shuffle=True, num_workers=config.core.num_workers, pin_memory=True)
 scale1_train_loader.is_last_loader = False
 
 scale2_config = fork(config)
 scale2_config.aug.ImageWithMasksRandomCropResizeAug.size = (int(1.5*384), int(1.5*384))
-scale2_config.datasets.FileLineCvSegDataset.composer = ESPNetScale2Composer(scale2_config)
+scale2_config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(scale2_config)
 scale2_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(scale2_config, './data/train.txt', ','),
     batch_size=config.core.batch_size, shuffle=True, num_workers=config.core.num_workers, pin_memory=True)
 scale2_train_loader.is_last_loader = False
 
 scale3_config = fork(config)
 scale3_config.aug.ImageWithMasksRandomCropResizeAug.size = (int(1.75*384), int(1.75*384))
-scale3_config.datasets.FileLineCvSegDataset.composer = ESPNetScale3Composer(scale3_config)
+scale3_config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(scale3_config)
 scale3_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(scale3_config, './data/train.txt', ','),
     batch_size=config.core.batch_size, shuffle=True, num_workers=config.core.num_workers, pin_memory=True)
 scale3_train_loader.is_last_loader = False
 
 scale4_config = fork(config)
 scale4_config.aug.ImageWithMasksRandomCropResizeAug.size = (int(2.0*384), int(2.0*384))
-scale4_config.datasets.FileLineCvSegDataset.composer = ESPNetScale4Composer(scale4_config)
+scale4_config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(scale4_config)
 scale4_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(scale4_config, './data/train.txt', ','),
     batch_size=config.core.batch_size, shuffle=True, num_workers=config.core.num_workers, pin_memory=True)
 scale4_train_loader.is_last_loader = False
