@@ -44,6 +44,7 @@ class ESPNetTrain(DeepvacTrain):
             overall_acc, per_class_acc, per_class_iu, mIOU = self.iou_eval_train.getMetric()
         else:
             overall_acc, per_class_acc, per_class_iu, mIOU = self.iou_eval_val.getMetric()
+            self.config.acc = mIOU
         LOG.logI("Epoch : {} Details".format(self.config.epoch))
         LOG.logI("\nEpoch No.: %d\t%s Loss = %.4f\t %s mIOU = %.4f\t" % (self.config.epoch, self.config.phase, average_epoch_loss, self.config.phase, mIOU))
 
