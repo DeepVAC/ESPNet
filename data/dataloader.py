@@ -57,6 +57,8 @@ class FileLineCvSegWithMetaInfoDataset(FileLineCvSegDataset):
         self.max_val_al = 0
         
         for image_path, label_path in self.samples:
+            if no_files % 100 == 0:
+                LOG.logI('accumulateMeanStd: {}'.format(no_files))
             self._accumulateMeanStd(image_path, label_path)
             no_files += 1
 
@@ -87,4 +89,8 @@ class FileLineCvSegWithMetaInfoDataset(FileLineCvSegDataset):
         data = self.processData()
         if data is None:
             LOG.logE('Error while pickling data. Please check.', exit=True)
+        LOG.logI('Process train dataset finished.')
+        LOG.logI('Your train dataset mean: {}'.format(data['mean']))
+        LOG.logI('Your train dataset std: {}'.format(data['std']))
+        LOG.logI('Your train dataset classWeights: {}'.format(data['classWeights']))
         return data
