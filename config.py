@@ -17,11 +17,12 @@ config.train_txt = './data/train.txt'
 config.val_txt = './data/val.txt'
 config.sample_path_prefix = './data'
 config.delimiter = ','
-config.cls_num = 4
+# cls_num must in core namespace, for IoU caculate.
+config.core.cls_num = 4
 ## -------------------- datasets & aug ------------------
 config.datasets.FileLineCvSegWithMetaInfoDataset = AttrDict()
 config.datasets.FileLineCvSegWithMetaInfoDataset.cached_data_file = 'clothes.p'
-config.datasets.FileLineCvSegWithMetaInfoDataset.classes = config.cls_num
+config.datasets.FileLineCvSegWithMetaInfoDataset.classes = config.core.cls_num
 config.datasets.FileLineCvSegWithMetaInfoDataset.norm_val = 1.10
 config.data = FileLineCvSegWithMetaInfoDataset(config, config.train_txt, config.sample_path_prefix)()
 config.datasets.FileLineCvSegDataset = AttrDict()
@@ -69,12 +70,12 @@ config.core.batch_size = 8
 # config.cast.TraceCast.dynamic_quantize_dir = "./quantize.sq"
 
 ## -------------------- net and criterion ------------------
-config.core.net = EESPNet_Seg(config.cls_num)
+config.core.net = EESPNet_Seg(config.core.cls_num)
 weight = torch.from_numpy(config.data['classWeights']).to(config.core.device)
 config.core.criterion = torch.nn.CrossEntropyLoss(weight)
 
 # config.core.teacher = AttrDict()
-# config.core.teacher.net = EESPNet_Seg(config.cls_num)
+# config.core.teacher.net = EESPNet_Seg(config.core.cls_num)
 # config.core.teacher.criterion = torch.nn.CrossEntropyLoss(weight)
 # config.core.teacher.optimizer = torch.optim.Adam(config.core.teacher.net.parameters(), 5e-4, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
 
