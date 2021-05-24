@@ -69,12 +69,12 @@ config.core.batch_size = 8
 # config.cast.TraceCast.dynamic_quantize_dir = "./quantize.sq"
 
 ## -------------------- net and criterion ------------------
-config.core.net = EESPNet_Seg(config.core.cls_num)
+config.core.net = EESPNet_Seg(config.cls_num)
 weight = torch.from_numpy(config.data['classWeights']).to(config.core.device)
 config.core.criterion = torch.nn.CrossEntropyLoss(weight)
 
 # config.core.teacher = AttrDict()
-# config.core.teacher.net = EESPNet_Seg(config.core.cls_num)
+# config.core.teacher.net = EESPNet_Seg(config.cls_num)
 # config.core.teacher.criterion = torch.nn.CrossEntropyLoss(weight)
 # config.core.teacher.optimizer = torch.optim.Adam(config.core.teacher.net.parameters(), 5e-4, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
 
