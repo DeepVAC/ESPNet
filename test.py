@@ -14,11 +14,6 @@ class ESPNetTest(Deepvac):
         super(ESPNetTest, self).__init__(deepvac_config)
         os.makedirs("output/show_results", exist_ok=True)
 
-    def initTestLoader(self):
-        config.core.test_dataset = OsWalkDataset2(config, config.test_sample_path)
-        config.core.test_loader = torch.utils.data.DataLoader(config.core.test_dataset, batch_size=1, shuffle=False, num_workers=config.core.num_workers, pin_memory=True)
-        super(ESPNetTest, self).initTestLoader()
-
     def postIter(self):
         self.config.mask = self.config.output[0][0].argmax(0).cpu().numpy()
         LOG.logI('{}: [output shape: {}] [{}/{}]'.format(self.config.phase, self.config.mask.shape, self.config.test_step + 1, len(self.config.test_loader)))
@@ -59,9 +54,10 @@ if __name__ == "__main__":
                 config.core.model_path or sys.argv[1] to init model path
                 config.test_sample_path or sys.argv[2] to init test sample path
                 for example:
-                python3 test.py <trained-model-path>'''
+                python3 test.py <trained-model-path> <test sample path>'''
         print(helper)
         sys.exit(1)
 
+    config.core.test_dataset = OsWalkDataset2(config, config.test_sample_path)
+    config.core.test_loader = torch.utils.data.DataLoader(config.core.test_dataset, batch_size=1, shuffle=False, num_workers=config.core.num_workers, pin_memory=True)
     ESPNetTest(config)()
-

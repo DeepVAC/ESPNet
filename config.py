@@ -108,6 +108,7 @@ config.datasets.OsWalkDataset2.transform = trans.Compose([trans.ToPILImage(),
     trans.ToTensor(),
     trans.Normalize(mean=(config.data["mean"] / 255.), std=config.data["std"])])
 
+
 ## ------------------ ddp --------------------
 # config.dist_url = 'tcp://localhost:27030'
 # config.world_size = 2
