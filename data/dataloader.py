@@ -2,7 +2,9 @@ import os
 import pickle
 import numpy as np
 import cv2
+import torch
 from deepvac import LOG
+from deepvac.datasets import OsWalkDataset
 from deepvac.datasets import FileLineCvSegDataset
 
 class FileLineCvSegWithMetaInfoDataset(FileLineCvSegDataset):
@@ -47,7 +49,7 @@ class FileLineCvSegWithMetaInfoDataset(FileLineCvSegDataset):
 
         if max_val > (self.classes - 1) or min_val < 0:
             LOG.logE('Some problem with labels. Please check image file: {}. Labels can take value between 0 and number of classes {}.'.format(label_file, self.classes-1), exit=True)
-            
+
 
     def _readFile(self):
         self.global_hist = np.zeros(self.classes, dtype=np.float32)
@@ -55,7 +57,7 @@ class FileLineCvSegWithMetaInfoDataset(FileLineCvSegDataset):
         no_files = 0
         self.min_val_al = 0
         self.max_val_al = 0
-        
+
         for image_path, label_path in self.samples:
             if no_files % 100 == 0:
                 LOG.logI('accumulateMeanStd: {}'.format(no_files))
@@ -94,3 +96,18 @@ class FileLineCvSegWithMetaInfoDataset(FileLineCvSegDataset):
         LOG.logI('Your train dataset std: {}'.format(data['std']))
         LOG.logI('Your train dataset classWeights: {}'.format(data['classWeights']))
         return data
+
+class OsWalkDataset2(OsWalkDataset):
+
+    def __init__(self, deepvac_config, sample_path):
+        super(OsWalkDataset2, self).__init__(deepvac_config, sample_path)
+
+    def __getitem__(self, index):
+        filepath = self.files[index]
+        sample = cv2.imread(filepath)
+        if self.config.transform is not None:
+            sample = self.config.transform(sample)
+        if self.config.composer is not None:
+            sample = self.config.composer(sample)
+        return filepath, sample
+

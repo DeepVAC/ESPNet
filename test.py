@@ -11,47 +11,35 @@ from deepvac import LOG, Deepvac
 class ESPNetTest(Deepvac):
     def __init__(self, deepvac_config):
         super(ESPNetTest, self).__init__(deepvac_config)
+        os.makedirs("output/show_results", exist_ok=True)
 
-    def post_process(self):
-        return self.config.output[0][0].max(0)[1].byte().cpu().data.numpy()
+    def postIter(self):
+        self.config.mask = self.config.output[0][0].argmax(0).cpu().numpy()
+        LOG.logI('{}: [output shape: {}] [{}/{}]'.format(self.config.phase, self.config.mask.shape, self.config.test_step + 1, len(self.config.test_loader)))
 
-    def pre_process(self, img_path):
-        img = cv2.imread(img_path)
-        img_orig = np.copy(img)
-        
-        img = img.astype(np.float32)
-        for j in range(3):
-            img[:, :, j] -= self.config.mean[j]
-        for j in range(3):
-            img[:, :, j] /= self.config.std[j]
+        cv_img = cv2.imread(self.config.filepath[0], 1)
+        h, w = cv_img.shape[:2]
+        self.config.mask = cv2.resize(np.uint8(self.config.mask), (w, h), cv2.INTER_NEAREST)
 
-        # resize the image to 1024x512x3
-        img = cv2.resize(img, (self.config.in_width, self.config.in_height))
-        img_orig = cv2.resize(img_orig, (self.config.in_width, self.config.in_height))
+        filename = self.config.filepath[0].split('/')[-1]
+        savepath = os.path.join("output/show_results", filename)
+        cv_img[:, :, 1][self.config.mask == 1] = 255
+        cv2.imwrite(savepath, cv_img)
+        LOG.logI('{}: [out cv image save to {}] [{}/{}]\n'.format(self.config.phase, savepath, self.config.test_step + 1, len(self.config.test_loader)))
 
-        img /= 255
-        img = img.transpose((2, 0, 1))
-        img_tensor = torch.from_numpy(img)
-        img_tensor = torch.unsqueeze(img_tensor, 0)  # add a batch dimension
+    def test(self):
+        LOG.logI("config.core.test_load has been set, do test() with config.core.test_loader")
+        for self.config.test_step, (self.config.filepath, self.config.sample) in enumerate(self.config.test_loader):
+            self.preIter()
+            self.doFeedData2Device()
+            self.doForward()
+            LOG.logI('{}: [input shape: {}] [{}/{}]'.format(self.config.phase, self.config.sample.shape, self.config.test_step + 1, len(self.config.test_loader)))
+            self.postIter()
 
-        return img_tensor
-
-def getFileList(input_dir):
-    f_list = []
-    fs = os.listdir(input_dir)
-    for f in fs:
-        f_list.append(os.path.join(input_dir, f))
-    
-    return f_list
 
 if __name__ == "__main__":
     from config import config
 
-    espnet_test = ESPNetTest(config)
+    config.core.model_path = "your model path"
+    ESPNetTest(config)()
 
-    files = getFileList('your test images path')
-    for f in files:
-        input_tensor = espnet_test.pre_process(f)
-        espnet_test(input_tensor)
-        result = espnet_test.post_process()
-        cv2.imwrite('./res_imgs/%s' % f.split('/')[-1].replace('jpg', 'png'), result)
