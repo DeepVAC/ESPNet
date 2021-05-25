@@ -107,8 +107,6 @@ config.datasets.OsWalkDataset2.transform = trans.Compose([trans.ToPILImage(),
     trans.Resize((384, 384)),
     trans.ToTensor(),
     trans.Normalize(mean=(config.data["mean"] / 255.), std=config.data["std"])])
-config.core.test_dataset = OsWalkDataset2(config, config.test_sample_path)
-config.core.test_loader = torch.utils.data.DataLoader(config.core.test_dataset, batch_size=1, shuffle=False, num_workers=config.core.num_workers, pin_memory=True)
 
 ## ------------------ ddp --------------------
 # config.dist_url = 'tcp://localhost:27030'

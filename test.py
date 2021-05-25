@@ -7,11 +7,17 @@ import torch
 import torch.nn.functional as F
 import deepvac
 from deepvac import LOG, Deepvac
+from data.dataloader import OsWalkDataset2
 
 class ESPNetTest(Deepvac):
     def __init__(self, deepvac_config):
         super(ESPNetTest, self).__init__(deepvac_config)
         os.makedirs("output/show_results", exist_ok=True)
+
+    def initTestLoader(self):
+        config.core.test_dataset = OsWalkDataset2(config, config.test_sample_path)
+        config.core.test_loader = torch.utils.data.DataLoader(config.core.test_dataset, batch_size=1, shuffle=False, num_workers=config.core.num_workers, pin_memory=True)
+        super(ESPNetTest, self).initTestLoader()
 
     def postIter(self):
         self.config.mask = self.config.output[0][0].argmax(0).cpu().numpy()
@@ -40,6 +46,22 @@ class ESPNetTest(Deepvac):
 if __name__ == "__main__":
     from config import config
 
-    config.core.model_path = "your model path"
+    def check_args(idx, argv):
+        return (len(argv) > idx) and (os.path.exists(argv[idx]))
+
+    if check_args(1, sys.argv):
+        config.core.model_path = sys.argv[1]
+    if check_args(2, sys.argv):
+        config.test_sample_path = sys.argv[2]
+
+    if (config.core.model_path is None) or (config.test_sample_path is None):
+        helper = '''model_path or test_sample_path not found, please check:
+                config.core.model_path or sys.argv[1] to init model path
+                config.test_sample_path or sys.argv[2] to init test sample path
+                for example:
+                python3 test.py <trained-model-path>'''
+        print(helper)
+        sys.exit(1)
+
     ESPNetTest(config)()
 
