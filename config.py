@@ -2,12 +2,13 @@ import os
 import math
 import pickle
 import torch
-import torch.optim as optim
+from torch import optim
 from torchvision import transforms as trans
 from deepvac import config, AttrDict, new, interpret, fork
 from deepvac import is_ddp
 from deepvac.datasets import FileLineCvSegDataset
 from deepvac.aug import MultiInputCompose
+from data.dataloader import OsWalkDataset2
 from data.dataloader import FileLineCvSegWithMetaInfoDataset
 from modules.model import EESPNet_Seg
 from aug.aug import *
@@ -16,12 +17,12 @@ from aug.aug import *
 config.train_txt = './data/train.txt'
 config.val_txt = './data/val.txt'
 config.sample_path_prefix = './data'
+# config.test_sample_path = "your test images dir"
 config.delimiter = ','
-# cls_num must in core namespace, for IoU caculate.
 config.core.cls_num = 4
 ## -------------------- datasets & aug ------------------
 config.datasets.FileLineCvSegWithMetaInfoDataset = AttrDict()
-config.datasets.FileLineCvSegWithMetaInfoDataset.cached_data_file = 'clothes.p'
+config.datasets.FileLineCvSegWithMetaInfoDataset.cached_data_file = 'data/clothes.p'
 config.datasets.FileLineCvSegWithMetaInfoDataset.classes = config.core.cls_num
 config.datasets.FileLineCvSegWithMetaInfoDataset.norm_val = 1.10
 config.data = FileLineCvSegWithMetaInfoDataset(config, config.train_txt, config.sample_path_prefix)()
@@ -57,7 +58,7 @@ config.core.epoch_num = 300
 config.core.save_num = 1
 config.core.shuffle = True
 config.core.batch_size = 8
-# config.core.model_path = "your model path"
+# config.core.model_path = "your trained model path"
 
 ## -------------------- tensorboard ------------------
 # config.core.tensorboard_port = "6007"
@@ -99,11 +100,13 @@ config.core.train_loader.is_last_loader = False
 
 config.datasets.FileLineCvSegDataset.composer = ESPNetValComposer(config)
 config.core.val_dataset = FileLineCvSegDataset(config, config.val_txt, config.delimiter, config.sample_path_prefix)
-config.core.val_loader = torch.utils.data.DataLoader(config.core.val_dataset,batch_size=4, shuffle=False, num_workers=config.core.num_workers, pin_memory=True)
+config.core.val_loader = torch.utils.data.DataLoader(config.core.val_dataset,batch_size=8, shuffle=False, num_workers=config.core.num_workers, pin_memory=True)
 
-config.datasets.FileLineCvSegDataset.composer = ESPNetValComposer(config)
-config.core.test_dataset = FileLineCvSegDataset(config, config.val_txt, config.delimiter, config.sample_path_prefix)
-config.core.test_loader = torch.utils.data.DataLoader(config.core.test_dataset, batch_size=4, shuffle=False, num_workers=config.core.num_workers, pin_memory=True)
+config.datasets.OsWalkDataset2 = AttrDict()
+config.datasets.OsWalkDataset2.transform = trans.Compose([trans.ToPILImage(),
+    trans.Resize((384, 384)),
+    trans.ToTensor(),
+    trans.Normalize(mean=(config.data["mean"] / 255.), std=config.data["std"])])
 
 ## ------------------ ddp --------------------
 # config.dist_url = 'tcp://localhost:27030'
