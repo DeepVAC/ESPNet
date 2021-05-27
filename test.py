@@ -12,30 +12,37 @@ from data.dataloader import OsWalkDataset2
 class ESPNetTest(Deepvac):
     def __init__(self, deepvac_config):
         super(ESPNetTest, self).__init__(deepvac_config)
-        os.makedirs("output/show_results", exist_ok=True)
+        os.makedirs(self.config.show_output_dir, exist_ok=True)
+
+    def preIter(self):
+        assert len(self.config.target) == 1, 'config.core.test_batch_size must be set to 1 in current test mode.'
+        self.config.filepath = self.config.target[0]
 
     def postIter(self):
-        self.config.mask = self.config.output[0][0].argmax(0).cpu().numpy()
+        self.config.output = self.config.output[0].squeeze().cpu().numpy()
+        if self.config.output.ndim == 2:
+            self.config.mask = (self.config.output > 0.5)
+        elif self.config.output.ndim == 3:
+            self.config.mask = self.config.output.argmax(0)
         LOG.logI('{}: [output shape: {}] [{}/{}]'.format(self.config.phase, self.config.mask.shape, self.config.test_step + 1, len(self.config.test_loader)))
 
-        cv_img = cv2.imread(self.config.filepath[0], 1)
+        cv_img = cv2.imread(self.config.filepath, 1)
         h, w = cv_img.shape[:2]
         self.config.mask = cv2.resize(np.uint8(self.config.mask), (w, h), cv2.INTER_NEAREST)
 
-        filename = self.config.filepath[0].split('/')[-1]
-        savepath = os.path.join("output/show_results", filename)
-        cv_img[:, :, 1][self.config.mask == 1] = 255
-        cv2.imwrite(savepath, cv_img)
-        LOG.logI('{}: [out cv image save to {}] [{}/{}]\n'.format(self.config.phase, savepath, self.config.test_step + 1, len(self.config.test_loader)))
+        filename = self.config.filepath.split('/')[-1]
+        mask_filename = filename + "_mask.png"
+        savepath = os.path.join(self.config.show_output_dir, filename)
+        mask_savepath = os.path.join(self.config.show_output_dir, mask_filename)
 
-    def test(self):
-        LOG.logI("config.core.test_load has been set, do test() with config.core.test_loader")
-        for self.config.test_step, (self.config.filepath, self.config.sample) in enumerate(self.config.test_loader):
-            self.preIter()
-            self.doFeedData2Device()
-            self.doForward()
-            LOG.logI('{}: [input shape: {}] [{}/{}]'.format(self.config.phase, self.config.sample.shape, self.config.test_step + 1, len(self.config.test_loader)))
-            self.postIter()
+        classMap_numpy_color = np.zeros((h, w, 3), dtype=np.uint8)
+        for idx in np.unique(self.config.mask):
+            [r, g, b] = self.config.pallete[idx]
+            classMap_numpy_color[self.config.mask == idx] = [b, g, r]
+        overlayed = cv2.addWeighted(cv_img, 0.5, classMap_numpy_color, 0.5, 0)
+        cv2.imwrite(savepath, overlayed)
+        cv2.imwrite(mask_savepath, classMap_numpy_color)
+        LOG.logI('{}: [out cv image save to {}] [{}/{}]\n'.format(self.config.phase, savepath, self.config.test_step + 1, len(self.config.test_loader)))
 
 
 if __name__ == "__main__":

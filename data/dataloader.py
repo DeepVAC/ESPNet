@@ -109,5 +109,5 @@ class OsWalkDataset2(OsWalkDataset):
             sample = self.config.transform(sample)
         if self.config.composer is not None:
             sample = self.config.composer(sample)
-        return filepath, sample
+        return sample, filepath
 
