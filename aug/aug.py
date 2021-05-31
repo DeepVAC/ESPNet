@@ -16,27 +16,16 @@ class BorderTargetAug(CvAugBase2):
 
         label_detail = np.zeros(label.shape, np.uint8)
 
-        hat = np.zeros(label.shape, np.uint8)
-        hat[np.where(label==1)] = 1
-        hat_dilate = cv2.dilate(hat, kernel, iterations=1)
-        hat_erode = cv2.erode(hat, kernel, iterations=1)
-        hat_detail = hat_dilate - hat_erode
-        label_detail[np.where(hat_detail==1)] = 1
+        for cls_idx in range(self.deepvac_config.core.cls_num):
+            if cls_idx == 0:
+                continue
+            cls_mask = np.zeros(label.shape, np.uint8)
+            cls_mask[np.where(label==cls_idx)] = 1
+            cls_dilate = cv2.dilate(cls_mask, kernel, iterations=1)
+            cls_erode = cv2.erode(cls_mask, kernel, iterations=1)
+            cls_detail = cls_dilate - cls_erode
+            label_detail[np.where(cls_detail==1)] = cls_idx
 
-        upclothes = np.zeros(label.shape, np.uint8)
-        upclothes[np.where(label==2)] = 1
-        upclothes_dilate = cv2.dilate(upclothes, kernel, iterations=1)
-        upclothes_erode = cv2.erode(upclothes, kernel, iterations=1)
-        upclothes_detail = upclothes_dilate - upclothes_erode
-        label_detail[np.where(upclothes_detail==1)] = 2
-
-        downclothes = np.zeros(label.shape, np.uint8)
-        downclothes[np.where(label==3)] = 1
-        downclothes_dilate = cv2.dilate(downclothes, kernel, iterations=1)
-        downclothes_erode = cv2.erode(downclothes, kernel, iterations=1)
-        downclothes_detail = downclothes_dilate - downclothes_erode
-        label_detail[np.where(downclothes_detail==1)] = 3
-        
         return [image, [label, label_detail]]
 
 class ImageWithTwoMasksToTensorAug(CvAugBase2):
