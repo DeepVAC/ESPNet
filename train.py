@@ -22,6 +22,12 @@ class ESPNetTrain(DeepvacTrain):
             self.config.train_loader = loader
             super(ESPNetTrain, self).train()
 
+    #only save model for last loader
+    def doSave(self):
+        if not self.config.train_loader.is_last_loader:
+            return
+        super(ESPNetTrain, self).doSave()
+
     def postIter(self):
         if not self.config.train_loader.is_last_loader:
             return

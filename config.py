@@ -43,7 +43,7 @@ config.core.pallete = [[255, 255, 255],
                         [119, 11,  32]]
 assert config.core.cls_num <= len(config.core.pallete), "seg cls num rathor than pallete length not support!"
 
-config.input_w = 224
+config.input_w = 384
 config.input_h = 384
 
 config.pin_memory = True if torch.cuda.is_available() else False
@@ -113,12 +113,12 @@ config.core.criterion = torch.nn.CrossEntropyLoss(weight)
 config.core.mean = config.data['mean']
 config.core.std = config.data['std']
 ## -------------------- optimizer and scheduler ------------------
-#config.core.optimizer = torch.optim.Adam(config.core.net.parameters(), 5e-4, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
-config.core.optimizer = torch.optim.SGD(config.core.net.parameters(), 7.030e-3, momentum=0.9)
+config.core.optimizer = torch.optim.Adam(config.core.net.parameters(), 3e-4, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
+# config.core.optimizer = torch.optim.SGD(config.core.net.parameters(), 5e-3, momentum=0.9)
 
-# lambda_lr = lambda epoch: round ((1 - epoch/config.core.epoch_num) ** 0.9, 8)
-# config.core.scheduler = optim.lr_scheduler.LambdaLR(config.core.optimizer, lr_lambda=lambda_lr)
-config.core.scheduler = optim.lr_scheduler.MultiStepLR(config.core.optimizer, milestones=[10,20,30,40,50,60,70,80,90,100,110,120,130,140,150], gamma=0.27030)
+lambda_lr = lambda epoch: round ((1 - epoch/config.core.epoch_num) ** 0.9, 8)
+config.core.scheduler = optim.lr_scheduler.LambdaLR(config.core.optimizer, lr_lambda=lambda_lr)
+# config.core.scheduler = optim.lr_scheduler.MultiStepLR(config.core.optimizer, milestones=[20,40,55,70,80,90,100,110,120,130,140,150,160], gamma=0.27030)
 
 ## -------------------- loader ------------------
 config.core.num_workers = 3
@@ -140,7 +140,6 @@ config.datasets.OsWalkDataset2.transform = trans.Compose([trans.ToPILImage(),
     trans.ToTensor(),
     trans.Normalize(mean=(config.data["mean"] / 255.), std=config.data["std"])])
 
-
 ## ------------------ ddp --------------------
 # config.dist_url = 'tcp://localhost:27030'
 # config.world_size = 2
@@ -151,32 +150,32 @@ last_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(config, con
 last_train_loader.is_last_loader = True
 
 scale1_config = fork(config)
-scale1_config.aug.ImageWithMasksScaleAug.w = makeDivisible(config.input_w * 1.15, 32)
-scale1_config.aug.ImageWithMasksScaleAug.h = makeDivisible(config.input_h * 1.15, 32)
+scale1_config.aug.ImageWithMasksScaleAug.w = makeDivisible(config.input_w * 1.5, 32)
+scale1_config.aug.ImageWithMasksScaleAug.h = makeDivisible(config.input_h * 1.5, 32)
 scale1_config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(scale1_config)
 scale1_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(scale1_config, config.train_txt, config.delimiter, config.sample_path_prefix),
     batch_size=config.core.batch_size, shuffle=True, num_workers=config.core.num_workers, pin_memory=config.pin_memory)
 scale1_train_loader.is_last_loader = False
 
 scale2_config = fork(config)
-scale2_config.aug.ImageWithMasksScaleAug.w = makeDivisible(config.input_w * 1.3, 32)
-scale2_config.aug.ImageWithMasksScaleAug.h = makeDivisible(config.input_h * 1.3, 32)
+scale2_config.aug.ImageWithMasksScaleAug.w = makeDivisible(config.input_w * 1.25, 32)
+scale2_config.aug.ImageWithMasksScaleAug.h = makeDivisible(config.input_h * 1.25, 32)
 scale2_config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(scale2_config)
 scale2_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(scale2_config, config.train_txt, config.delimiter, config.sample_path_prefix),
     batch_size=config.core.batch_size, shuffle=True, num_workers=config.core.num_workers, pin_memory=config.pin_memory)
 scale2_train_loader.is_last_loader = False
 
 scale3_config = fork(config)
-scale3_config.aug.ImageWithMasksScaleAug.w = makeDivisible(config.input_w * 1.45, 32)
-scale3_config.aug.ImageWithMasksScaleAug.h = makeDivisible(config.input_h * 1.45, 32)
+scale3_config.aug.ImageWithMasksScaleAug.w = makeDivisible(config.input_w * 0.75, 32)
+scale3_config.aug.ImageWithMasksScaleAug.h = makeDivisible(config.input_h * 0.75, 32)
 scale3_config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(scale3_config)
 scale3_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(scale3_config, config.train_txt, config.delimiter, config.sample_path_prefix),
     batch_size=config.core.batch_size, shuffle=True, num_workers=config.core.num_workers, pin_memory=config.pin_memory)
 scale3_train_loader.is_last_loader = False
 
 scale4_config = fork(config)
-scale4_config.aug.ImageWithMasksScaleAug.w = makeDivisible(config.input_w * 1.6, 32)
-scale4_config.aug.ImageWithMasksScaleAug.h = makeDivisible(config.input_h * 1.6, 32)
+scale4_config.aug.ImageWithMasksScaleAug.w = makeDivisible(config.input_w * 0.5, 32)
+scale4_config.aug.ImageWithMasksScaleAug.h = makeDivisible(config.input_h * 0.5, 32)
 
 scale4_config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(scale4_config)
 scale4_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(scale4_config, config.train_txt, config.delimiter, config.sample_path_prefix),
