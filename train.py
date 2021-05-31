@@ -21,16 +21,16 @@ class ESPNetTrain(DeepvacTrain):
         for i, loader in enumerate(self.config.train_loader_list):
             self.config.train_loader = loader
             super(ESPNetTrain, self).train()
-        
+
     def postIter(self):
         if not self.config.train_loader.is_last_loader:
             return
 
         self.config.epoch_loss.append(self.config.loss.item())
         if self.config.phase == 'TRAIN':
-            self.iou_eval_train.addBatch(self.config.output[0].max(1)[1].data, self.config.target.data)
+            self.iou_eval_train.addBatch(self.config.output[0].max(1)[1].data.cpu().numpy(), self.config.target.data)
         else:
-            self.iou_eval_val.addBatch(self.config.output[0].max(1)[1].data, self.config.target.data)
+            self.iou_eval_val.addBatch(self.config.output[0].max(1)[1].data.cpu().numpy(), self.config.target.data)
 
     def preEpoch(self):
         self.config.epoch_loss = []

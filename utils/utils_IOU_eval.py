@@ -21,8 +21,8 @@ class IOUEval:
         return hist
 
     def addBatch(self, predict, gth):
-        predict = predict.cpu().numpy().flatten()
-        gth = gth.cpu().numpy().flatten()
+        predict = predict.flatten()
+        gth = gth.flatten()
 
         epsilon = 0.00000001
         hist = self.compute_hist(predict, gth)
