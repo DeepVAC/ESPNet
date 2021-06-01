@@ -16,7 +16,7 @@ class BorderTargetAug(CvAugBase2):
 
         label_detail = np.zeros(label.shape, np.uint8)
 
-        for cls_idx in range(self.deepvac_config.core.cls_num):
+        for cls_idx in range(config.core.cls_num):
             if cls_idx == 0:
                 continue
             cls_mask = np.zeros(label.shape, np.uint8)
