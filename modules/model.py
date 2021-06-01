@@ -9,7 +9,7 @@ from deepvac.backbones import Conv2dBNPReLU, Conv2dBN, BNPReLU, Conv2dDilatedBN,
 
 class PSPModule(nn.Module):
     def __init__(self, features, out_features=1024, sizes=(1, 2, 4, 8)):
-        super().__init__()
+        super(PSPModule, self).__init__()
         self.stages = []
         self.stages = nn.ModuleList([nn.Conv2d(features, features, 3, 1, 1, bias=False, groups=features) for size in sizes])
         self.project = Conv2dBNPReLU(features * (len(sizes) + 1), out_features, 1, 1)
@@ -95,24 +95,20 @@ class DownSampler(nn.Module):
         return self.act(output)
 
 class EESPNet(nn.Module):
-    def __init__(self, classes=20, s=2.0):
+    def __init__(self):
         super(EESPNet, self).__init__()
-        reps = [0, 3, 7, 3]
+        r_lim = [13, 11, 9, 7]
+        config = [32, 128, 256, 512]
+
         channels = 3
-
-        r_lim = [13, 11, 9, 7, 5]
-
-        config = [32, 128, 256, 512, 1024, 1280]
-
         self.level1 = Conv2dBNPReLU(channels, config[0], 3, 2)
-
         self.level2_0 = DownSampler(config[0], config[1], k=4, r_lim=r_lim[0], down_times=2)
 
         self.level3_0 = DownSampler(config[1], config[2], k=4, r_lim=r_lim[1], down_times=3)
-        self.level3 = nn.Sequential(*[EESP(config[2], config[2], stride=1, k=4, r_lim=r_lim[2]) for i in range(reps[1])])
+        self.level3 = nn.Sequential(*[EESP(config[2], config[2], stride=1, k=4, r_lim=r_lim[2]) for i in range(3)])
 
         self.level4_0 = DownSampler(config[2], config[3], k=4, r_lim=r_lim[2], down_times=4)
-        self.level4 = nn.Sequential(*[EESP(config[3], config[3], stride=1, k=4, r_lim=r_lim[3]) for i in range(reps[2])])
+        self.level4 = nn.Sequential(*[EESP(config[3], config[3], stride=1, k=4, r_lim=r_lim[3]) for i in range(7)])
 
         initWeightsKaiming(self)
 
