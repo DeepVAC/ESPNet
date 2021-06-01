@@ -16,15 +16,12 @@ from deepvac import LOG, DeepvacTrain
 class ESPNetTrain(DeepvacTrain):
     def __init__(self, deepvac_config):
         super(ESPNetTrain, self).__init__(deepvac_config)
+        self.config.net.freeze_norm()
 
     def preEpoch(self):
         LOG.logI("backup modnet copying ... ...")
         self.config.net_backup = copy.deepcopy(self.config.net)
-
-    def preIter(self):
         self.config.net_backup.eval()
-        self.config.net.train()
-        self.config.net.freeze_norm()
 
     def doForward(self):
         super(ESPNetTrain, self).doForward()
