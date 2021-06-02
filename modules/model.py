@@ -143,6 +143,13 @@ class EESPNet_Seg(nn.Module):
             x = F.interpolate(x, scale_factor=2, mode='bilinear', align_corners=True)
         return x
 
+    def freeze_norm(self):
+        norm_types = (nn.BatchNorm2d, nn.InstanceNorm2d)
+        for m in self.modules():
+            if isinstance(m, norm_types):
+                m.eval()
+                continue
+
     def forward(self, input):
         out_l1, out_l2, out_l3, out_l4 = self.net(input)
         out_l4_proj = self.proj_L4_C(out_l4)
@@ -154,7 +161,9 @@ class EESPNet_Seg(nn.Module):
         merge_l2 = self.project_l2(torch.cat([out_l2, out_up_l3], 1))
         out_up_l2 = F.interpolate(merge_l2, scale_factor=2, mode='bilinear', align_corners=True)
         merge_l1 = self.project_l1(torch.cat([out_l1, out_up_l2], 1))
-        return F.interpolate(merge_l1, scale_factor=2, mode='bilinear', align_corners=True), self.hierarchicalUpsample(proj_merge_l3_bef_act)
+        return F.interpolate(merge_l1, scale_factor=2, mode='bilinear', align_corners=True), \
+                F.interpolate(out_up_l2, scale_factor=2, mode='bilinear', align_corners=True), \
+                proj_merge_l3_bef_act
 
 if __name__ == '__main__':
     input = torch.Tensor(1, 3, 512, 1024).cuda()
