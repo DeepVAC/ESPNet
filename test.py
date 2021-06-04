@@ -8,7 +8,7 @@ import torch
 import torch.nn.functional as F
 import deepvac
 from deepvac import LOG, Deepvac
-from utils.utils_IOU_eval import IOUEval
+from modules.utils_IOU_eval import IOUEval
 from data.dataloader import OsWalkDataset2
 
 class ESPNetTest(Deepvac):
