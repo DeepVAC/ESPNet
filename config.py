@@ -4,8 +4,8 @@ from torch import optim
 from torch.optim import lr_scheduler
 from torchvision import transforms as trans
 
-from deepvac import config, AttrDict, new, interpret, fork, is_ddp
-from deepvac.datasets import OsWalkDataset
+from deepvac import config, AttrDict, new, interpret, fork
+from deepvac.datasets import OsWalkDataset, OsWalkBaseDataset
 
 from modules.model import EESPNet_Seg
 
@@ -44,8 +44,8 @@ config.datasets.OsWalkDataset.transform = trans.Compose([trans.ToPILImage(),
     trans.Resize((384, 384)),
     trans.ToTensor(),
     trans.Normalize(mean=config.core.mean, std=config.core.std)])
-config.datasets.OsWalkDataset2 = AttrDict()
-config.datasets.OsWalkDataset2.transform = trans.Compose([trans.ToPILImage(),
+config.datasets.OsWalkBaseDataset = AttrDict()
+config.datasets.OsWalkBaseDataset.transform = trans.Compose([trans.ToPILImage(),
     trans.Resize((384, 384)),
     trans.ToTensor(),
     trans.Normalize(mean=config.core.mean, std=config.core.std)])
