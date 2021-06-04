@@ -6,10 +6,9 @@ from torch import optim
 from torchvision import transforms as trans
 from deepvac import config, AttrDict, new, interpret, fork
 from deepvac import is_ddp
-from deepvac.datasets import FileLineCvSegDataset
+from deepvac.datasets import FileLineCvSegDataset, OsWalkBaseDataset
 from deepvac.aug import MultiInputCompose
 from deepvac.backbones import makeDivisible
-from data.dataloader import OsWalkDataset2
 from data.dataloader import FileLineCvSegWithMetaInfoDataset
 from modules.model import EESPNet_Seg
 from aug.aug import *
@@ -126,8 +125,8 @@ config.datasets.FileLineCvSegDataset.composer = ESPNetValComposer(config)
 config.core.val_dataset = FileLineCvSegDataset(config, config.val_txt, config.delimiter, config.sample_path_prefix)
 config.core.val_loader = torch.utils.data.DataLoader(config.core.val_dataset,batch_size=8, shuffle=False, num_workers=config.core.num_workers, pin_memory=config.pin_memory)
 
-config.datasets.OsWalkDataset2 = AttrDict()
-config.datasets.OsWalkDataset2.transform = trans.Compose([trans.ToPILImage(),
+config.datasets.OsWalkBaseDataset = AttrDict()
+config.datasets.OsWalkBaseDataset.transform = trans.Compose([trans.ToPILImage(),
     trans.Resize((config.input_h, config.input_w)),
     trans.ToTensor(),
     trans.Normalize(mean=(config.data["mean"] / 255.), std=config.data["std"])])

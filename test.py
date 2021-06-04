@@ -8,8 +8,8 @@ import torch
 import torch.nn.functional as F
 import deepvac
 from deepvac import LOG, Deepvac
+from deepvac.datasets import OsWalkBaseDataset
 from modules.utils_IOU_eval import IOUEval
-from data.dataloader import OsWalkDataset2
 
 class ESPNetTest(Deepvac):
     def __init__(self, deepvac_config):
@@ -88,6 +88,6 @@ if __name__ == "__main__":
         print(helper)
         sys.exit(1)
 
-    config.core.test_dataset = OsWalkDataset2(config, config.test_sample_path)
+    config.core.test_dataset = OsWalkBaseDataset(config, config.test_sample_path)
     config.core.test_loader = torch.utils.data.DataLoader(config.core.test_dataset, batch_size=1, shuffle=False, num_workers=config.core.num_workers, pin_memory=True)
     ESPNetTest(config)()
