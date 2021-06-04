@@ -10,7 +10,7 @@ from torch import optim
 import deepvac
 from deepvac import LOG, DeepvacTrain
 from deepvac.experimental.core import DeepvacDistill
-from utils.utils_IOU_eval import IOUEval
+from modules.utils_IOU_eval import IOUEval
 
 class ESPNetTrain(DeepvacDistill):
     def __init__(self, deepvac_config):

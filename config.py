@@ -22,9 +22,9 @@ config.sample_path_prefix = './data'
 config.delimiter = ','
 config.core.cls_num = 4
 config.core.pallete = [[255, 255, 255],
-                        [255, 0,  0],
-                        [0, 255,  0],
-                        [0,  0,  255],
+                        [128, 64,  128],
+                        [244, 35,  232],
+                        [70,  70,  70],
                         [102, 102, 156],
                         [190, 153, 153],
                         [153, 153, 153],
@@ -84,7 +84,7 @@ config.core.cast_state_dict_strict = False
 #config.core.jit_model_path = "<your-script-or-quantize-model-path>"
 
 ## -------------------- training ------------------
-config.core.epoch_num = 300
+config.core.epoch_num = 100
 config.core.save_num = 1
 config.core.shuffle = True
 config.core.batch_size = 16
@@ -105,17 +105,10 @@ config.core.net = EESPNet_Seg(config.core.cls_num)
 weight = torch.from_numpy(config.data['classWeights']).to(config.core.device)
 config.core.criterion = [torch.nn.CrossEntropyLoss(weight), torch.nn.CrossEntropyLoss(weight, reduction="none")]
 
-# config.core.teacher = AttrDict()
-# config.core.teacher.net = EESPNet_Seg(config.core.cls_num)
-# config.core.teacher.criterion = torch.nn.CrossEntropyLoss(weight)
-# config.core.teacher.optimizer = torch.optim.Adam(config.core.teacher.net.parameters(), 5e-4, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
-
 config.core.mean = config.data['mean']
 config.core.std = config.data['std']
-
 ## -------------------- optimizer and scheduler ------------------
-config.core.optimizer = torch.optim.Adam(config.core.net.parameters(), 5e-4, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
-
+config.core.optimizer = torch.optim.Adam(config.core.net.parameters(), 3e-4, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
 lambda_lr = lambda epoch: round ((1 - epoch/config.core.epoch_num) ** 0.9, 8)
 config.core.scheduler = optim.lr_scheduler.LambdaLR(config.core.optimizer, lr_lambda=lambda_lr)
 
