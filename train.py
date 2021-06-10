@@ -71,7 +71,7 @@ class ESPNetTrain(DeepvacTrain):
         pred_fusion, pred_detail, pred_sematic = self.config.output
         gt_fusion, gt_detail = self.config.target
         # do semantic loss
-        gt_semantic = F.interpolate(gt_fusion.unsqueeze(1).float(), scale_factor=1/8, mode='nearest').long().squeeze()
+        gt_semantic = F.interpolate(gt_fusion.unsqueeze(1).float(), scale_factor=1/8, mode='nearest').long().squeeze(1)
         semantic_loss = self.config.criterion[0](pred_sematic, gt_semantic)
 
         # do detail loss
