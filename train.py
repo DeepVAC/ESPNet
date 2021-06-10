@@ -67,7 +67,7 @@ class ESPNetTrain(DeepvacTrain):
         backup_detail_loss = torch.mean(backup_detail_loss)
 
         # sub-objectives consistency between pred_matte` and `pred_backup_matte` (on boundaries only)
-        backup_fusion_loss = boundaries * F.cross_entropy(pred_fusion, backup_fusion.max(1)[1], weight=self.config.classes_weight, reduction='none')
+        backup_fusion_loss = boundaries * F.cross_entropy(pred_fusion, backup_fusion.max(1)[1], reduction='none')
         backup_fusion_loss = torch.mean(backup_fusion_loss)
 
         self.config.loss = 5*soc_semantic_loss + backup_detail_loss + backup_fusion_loss
