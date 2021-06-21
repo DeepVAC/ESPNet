@@ -7,7 +7,6 @@ from deepvac.aug.base_aug import AugBase
 from deepvac.aug.factory import AugFactory
 from deepvac.aug import Composer, PickOneComposer, CvAugBase, CvAugBase2
 from deepvac.utils import addUserConfig
-from config import config
 
 class BorderTargetAug(CvAugBase2):
     def forward(self, img):
@@ -16,7 +15,7 @@ class BorderTargetAug(CvAugBase2):
 
         label_detail = np.zeros(label.shape, np.uint8)
 
-        for cls_idx in range(config.core.cls_num):
+        for cls_idx in range(self.config.cls_num):
             if cls_idx == 0:
                 continue
             cls_mask = np.zeros(label.shape, np.uint8)
