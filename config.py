@@ -71,8 +71,8 @@ config.core.ESPNetTrain.save_num = 1
 config.core.ESPNetTrain.model_path = "/opt/public/pretrain/ESPNetv2/imagenet/espnetv2_s_2.0.pth"
 
 ## -------------------- tensorboard ------------------
-# config.core.tensorboard_port = "6007"
-# config.core.tensorboard_ip = None
+# config.core.ESPNetTrain.tensorboard_port = "6007"
+# config.core.ESPNetTrain.tensorboard_ip = None
 
 ## -------------------- script and quantize ------------------
 # config.cast.TraceCast = AttrDict()
