@@ -9,6 +9,7 @@ import torch.nn.functional as F
 import deepvac
 from deepvac import LOG, Deepvac
 from deepvac.datasets import OsWalkBaseDataset
+from deepvac.utils import pallete20
 from modules.utils_IOU_eval import IOUEval
 
 class ESPNetTest(Deepvac):
@@ -46,7 +47,7 @@ class ESPNetTest(Deepvac):
 
         classMap_numpy_color = np.zeros((h, w, 3), dtype=np.uint8)
         for idx in np.unique(self.config.mask):
-            [r, g, b] = self.config.pallete[idx]
+            [r, g, b] = pallete20[idx]
             classMap_numpy_color[self.config.mask == idx] = [b, g, r]
         overlayed = cv2.addWeighted(cv_img, 0.5, classMap_numpy_color, 0.5, 0)
         cv2.imwrite(savepath, overlayed)
@@ -64,9 +65,9 @@ class ESPNetTest(Deepvac):
 
         LOG.logE("You have to reimplement testFly() in subclass {} if you didn't set any valid input, e.g. config.core.test_loader.".format(self.name()), exit=True)
 
-
 if __name__ == "__main__":
     from config import config
+    assert config.cls_num <= len(pallete20), "seg cls num {} is greater than pallete length {}, not support!".format(config.cls_num, pallete20)
 
     def check_args(idx, argv):
         return (len(argv) > idx) and (os.path.exists(argv[idx]))
