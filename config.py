@@ -12,27 +12,6 @@ from modules.model import EESPNet_Seg
 ## -------------------- global ------------------
 config.sample_path = "your image path"
 config.core.cls_num = 4
-config.core.pallete = [[255, 255, 255],
-                        [128, 64,  128],
-                        [244, 35,  232],
-                        [70,  70,  70],
-                        [102, 102, 156],
-                        [190, 153, 153],
-                        [153, 153, 153],
-                        [250, 170, 30],
-                        [220, 220, 0],
-                        [107, 142, 35],
-                        [152, 251, 152],
-                        [70,  130, 180],
-                        [220, 20,  60],
-                        [255, 0,   0],
-                        [0,   0,   142],
-                        [0,   0,   70],
-                        [0,   60,  100],
-                        [0,   80,  100],
-                        [0,   0,   230],
-                        [119, 11,  32]]
-assert config.core.cls_num <= len(config.core.pallete), "seg cls num rathor than pallete length not support!"
 config.core.mean = torch.Tensor([137.78314, 141.16818, 149.62434]) / 255.
 config.core.std  = torch.Tensor([63.96097 , 64.199165, 64.6029])
 config.core.classes_weight = torch.Tensor([1.5393538, 10.010507, 5.790331, 5.704213])
