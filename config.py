@@ -83,14 +83,12 @@ config.core.ESPNetTrain.model_path = "/opt/public/pretrain/ESPNetv2/imagenet/esp
 ## -------------------- net and criterion ------------------
 config.core.ESPNetTrain.cls_num = config.cls_num
 config.core.ESPNetTrain.net = EESPNet_Seg(config.cls_num)
-weight = torch.from_numpy(config.data['classWeights']).to(config.core.device)
+weight = torch.from_numpy(config.data['classWeights']).to(config.core.ESPNetTrain.device)
 config.core.ESPNetTrain.criterion = [torch.nn.CrossEntropyLoss(weight), torch.nn.CrossEntropyLoss(weight, reduction="none")]
 
-config.core.mean = config.data['mean']
-config.core.std = config.data['std']
 ## -------------------- optimizer and scheduler ------------------
 config.core.ESPNetTrain.optimizer = torch.optim.Adam(config.core.ESPNetTrain.net.parameters(), 3e-4, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
-lambda_lr = lambda epoch: round ((1 - epoch/config.core.epoch_num) ** 0.9, 8)
+lambda_lr = lambda epoch: round ((1 - epoch/config.core.ESPNetTrain.epoch_num) ** 0.9, 8)
 config.core.ESPNetTrain.scheduler = optim.lr_scheduler.LambdaLR(config.core.ESPNetTrain.optimizer, lr_lambda=lambda_lr)
 
 ## -------------------- loader ------------------
