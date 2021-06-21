@@ -20,7 +20,7 @@ config.val_txt = './data/val.txt'
 config.sample_path_prefix = './data'
 # config.test_sample_path = "your test images dir"
 config.delimiter = ','
-config.cls_num = 2
+config.cls_num = 4
 config.input_w = 384
 config.input_h = 384
 
@@ -29,7 +29,7 @@ torch.backends.cudnn.benchmark=True
 
 ## -------------------- datasets & aug ------------------
 config.datasets.FileLineCvSegWithMetaInfoDataset = AttrDict()
-config.datasets.FileLineCvSegWithMetaInfoDataset.cached_data_file = 'data/human.p'
+config.datasets.FileLineCvSegWithMetaInfoDataset.cached_data_file = 'data/clothes.p'
 config.datasets.FileLineCvSegWithMetaInfoDataset.classes = config.cls_num
 config.datasets.FileLineCvSegWithMetaInfoDataset.norm_val = 1.10
 config.data = FileLineCvSegWithMetaInfoDataset(config, config.train_txt, config.sample_path_prefix)()
@@ -82,6 +82,7 @@ config.core.model_path = "/opt/public/pretrain/ESPNetv2/imagenet/espnetv2_s_2.0.
 # config.cast.TraceCast.dynamic_quantize_dir = "./quantize.sq"
 
 ## -------------------- net and criterion ------------------
+config.core.ESPNetTrain.cls_num = config.cls_num
 config.core.ESPNetTrain.net = EESPNet_Seg(config.cls_num)
 weight = torch.from_numpy(config.data['classWeights']).to(config.core.device)
 config.core.ESPNetTrain.criterion = [torch.nn.CrossEntropyLoss(weight), torch.nn.CrossEntropyLoss(weight, reduction="none")]
