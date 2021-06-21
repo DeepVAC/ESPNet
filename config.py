@@ -85,7 +85,7 @@ config.core.ESPNetTrain.criterion = torch.nn.CrossEntropyLoss(weight)
 
 ## -------------------- optimizer and scheduler ------------------
 config.core.ESPNetTrain.optimizer = torch.optim.Adam(config.core.ESPNetTrain.net.parameters(), 3e-4, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
-lambda_lr = lambda epoch: round ((1 - epoch/config.ESPNetTrain.core.epoch_num) ** 0.9, 8)
+lambda_lr = lambda epoch: round ((1 - epoch/config.core.ESPNetTrain.epoch_num) ** 0.9, 8)
 config.core.ESPNetTrain.scheduler = optim.lr_scheduler.LambdaLR(config.core.ESPNetTrain.optimizer, lr_lambda=lambda_lr)
 
 ## -------------------- loader ------------------
