@@ -26,6 +26,7 @@ config.input_h = 384
 
 config.pin_memory = True if torch.cuda.is_available() else False
 torch.backends.cudnn.benchmark=True
+config.batch_size = 16
 
 ## -------------------- datasets & aug ------------------
 config.datasets.FileLineCvSegWithMetaInfoDataset = AttrDict()
@@ -54,22 +55,20 @@ config.aug.BorderTargetAug = AttrDict()
 config.aug.BorderTargetAug.cls_num = config.cls_num
 
 ## ------------------ common ------------------
-config.core.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-config.core.output_dir = 'output'
-config.core.show_output_dir = 'output/show'
-config.core.log_every = 10
-config.core.disable_git = False
-config.core.model_reinterpret_cast = True
-config.core.cast_state_dict_strict = False
+config.core.ESPNetTrain.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+config.core.ESPNetTrain.output_dir = 'output'
+config.core.ESPNetTrain.show_output_dir = 'output/show'
+config.core.ESPNetTrain.log_every = 10
+config.core.ESPNetTrain.disable_git = False
+config.core.ESPNetTrain.model_reinterpret_cast = True
+config.core.ESPNetTrain.cast_state_dict_strict = False
 # load script and quantize model path
-#config.core.jit_model_path = "<your-script-or-quantize-model-path>"
+#config.core.ESPNetTrain.jit_model_path = "<your-script-or-quantize-model-path>"
 
 ## -------------------- training ------------------
-config.core.epoch_num = 100
-config.core.save_num = 1
-config.core.shuffle = True
-config.core.batch_size = 16
-config.core.model_path = "/opt/public/pretrain/ESPNetv2/imagenet/espnetv2_s_2.0.pth"
+config.core.ESPNetTrain.epoch_num = 100
+config.core.ESPNetTrain.save_num = 1
+config.core.ESPNetTrain.model_path = "/opt/public/pretrain/ESPNetv2/imagenet/espnetv2_s_2.0.pth"
 
 ## -------------------- tensorboard ------------------
 # config.core.tensorboard_port = "6007"
@@ -100,7 +99,7 @@ config.num_workers = 3
 #just for fool deepvac
 config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(config)
 config.core.ESPNetTrain.train_dataset = FileLineCvSegDataset(config, config.train_txt, config.delimiter, config.sample_path_prefix)
-config.core.ESPNetTrain.train_loader = torch.utils.data.DataLoader(config.core.ESPNetTrain.train_dataset, batch_size=config.core.batch_size, shuffle=True, num_workers=config.num_workers, pin_memory=config.pin_memory)
+config.core.ESPNetTrain.train_loader = torch.utils.data.DataLoader(config.core.ESPNetTrain.train_dataset, batch_size=config.batch_size, shuffle=True, num_workers=config.num_workers, pin_memory=config.pin_memory)
 config.core.ESPNetTrain.train_loader.is_last_loader = False
 #fool end
 
@@ -120,7 +119,7 @@ config.datasets.OsWalkBaseDataset.transform = trans.Compose([trans.ToPILImage(),
 
 config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(config)
 last_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(config, config.train_txt, config.delimiter, config.sample_path_prefix),
-    batch_size=config.core.batch_size, shuffle=True, num_workers=config.num_workers, pin_memory=config.pin_memory)
+    batch_size=config.batch_size, shuffle=True, num_workers=config.num_workers, pin_memory=config.pin_memory)
 last_train_loader.is_last_loader = True
 
 scale1_config = fork(config)
@@ -128,7 +127,7 @@ scale1_config.aug.ImageWithMasksScaleAug.w = makeDivisible(config.input_w * 1.5,
 scale1_config.aug.ImageWithMasksScaleAug.h = makeDivisible(config.input_h * 1.5, 32)
 scale1_config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(scale1_config)
 scale1_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(scale1_config, config.train_txt, config.delimiter, config.sample_path_prefix),
-    batch_size=config.core.batch_size, shuffle=True, num_workers=config.num_workers, pin_memory=config.pin_memory)
+    batch_size=config.batch_size, shuffle=True, num_workers=config.num_workers, pin_memory=config.pin_memory)
 scale1_train_loader.is_last_loader = False
 
 scale2_config = fork(config)
@@ -136,7 +135,7 @@ scale2_config.aug.ImageWithMasksScaleAug.w = makeDivisible(config.input_w * 1.25
 scale2_config.aug.ImageWithMasksScaleAug.h = makeDivisible(config.input_h * 1.25, 32)
 scale2_config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(scale2_config)
 scale2_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(scale2_config, config.train_txt, config.delimiter, config.sample_path_prefix),
-    batch_size=config.core.batch_size, shuffle=True, num_workers=config.num_workers, pin_memory=config.pin_memory)
+    batch_size=config.batch_size, shuffle=True, num_workers=config.num_workers, pin_memory=config.pin_memory)
 scale2_train_loader.is_last_loader = False
 
 scale3_config = fork(config)
@@ -144,7 +143,7 @@ scale3_config.aug.ImageWithMasksScaleAug.w = makeDivisible(config.input_w * 0.75
 scale3_config.aug.ImageWithMasksScaleAug.h = makeDivisible(config.input_h * 0.75, 32)
 scale3_config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(scale3_config)
 scale3_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(scale3_config, config.train_txt, config.delimiter, config.sample_path_prefix),
-    batch_size=config.core.batch_size, shuffle=True, num_workers=config.num_workers, pin_memory=config.pin_memory)
+    batch_size=config.batch_size, shuffle=True, num_workers=config.num_workers, pin_memory=config.pin_memory)
 scale3_train_loader.is_last_loader = False
 
 scale4_config = fork(config)
@@ -153,7 +152,7 @@ scale4_config.aug.ImageWithMasksScaleAug.h = makeDivisible(config.input_h * 0.5,
 
 scale4_config.datasets.FileLineCvSegDataset.composer = ESPNetTrainComposer(scale4_config)
 scale4_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(scale4_config, config.train_txt, config.delimiter, config.sample_path_prefix),
-    batch_size=config.core.batch_size, shuffle=True, num_workers=config.num_workers, pin_memory=config.pin_memory)
+    batch_size=config.batch_size, shuffle=True, num_workers=config.num_workers, pin_memory=config.pin_memory)
 scale4_train_loader.is_last_loader = False
 # multi loader
 config.core.ESPNetTrain.train_loader_list = [scale1_train_loader, scale2_train_loader, scale4_train_loader, scale3_train_loader, last_train_loader]

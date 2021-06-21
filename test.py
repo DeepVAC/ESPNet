@@ -67,7 +67,7 @@ class ESPNetTest(Deepvac):
 
 if __name__ == "__main__":
     from config import config
-    assert config.core.cls_num <= len(pallete20), "seg cls num {} is greater than pallete length {}, not support!".format(config.core.cls_num, pallete20)
+    assert config.cls_num <= len(pallete20), "seg cls num {} is greater than pallete length {}, not support!".format(config.cls_num, pallete20)
 
     def check_args(idx, argv):
         return (len(argv) > idx) and (os.path.exists(argv[idx]))
