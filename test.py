@@ -54,7 +54,7 @@ class ESPNetTest(Deepvac):
         cv2.imwrite(mask_savepath, classMap_numpy_color)
         LOG.logI('{}: [out cv image save to {}] [{}/{}]\n'.format(self.config.phase, savepath, self.config.test_step + 1, len(self.config.test_loader)))
 
-    def testFly(self):
+    def doTest(self):
         if self.config.test_loader:
             self.test()
             if self.config.test_label_path is None:
@@ -63,7 +63,7 @@ class ESPNetTest(Deepvac):
             LOG.logI(">>> {}: [dataset: {}, mIOU: {:.3f}]".format(self.config.phase, self.config.filepath.split('/')[-2], self.config.mIOU))
             return
 
-        LOG.logE("You have to reimplement testFly() in subclass {} if you didn't set any valid input, e.g. config.core.test_loader.".format(self.name()), exit=True)
+        LOG.logE("You have to reimplement doTest() in subclass {} if you didn't set any valid input, e.g. config.core.test_loader.".format(self.name()), exit=True)
 
 if __name__ == "__main__":
     from config import config
