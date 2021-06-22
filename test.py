@@ -73,22 +73,22 @@ if __name__ == "__main__":
         return (len(argv) > idx) and (os.path.exists(argv[idx]))
 
     if check_args(1, sys.argv):
-        config.core.model_path = sys.argv[1]
+        config.core.ESPNetTest.model_path = sys.argv[1]
     if check_args(2, sys.argv):
-        config.test_sample_path = sys.argv[2]
+        config.core.ESPNetTest.test_sample_path = sys.argv[2]
     if check_args(3, sys.argv):
-        config.core.test_label_path = sys.argv[3]
+        config.core.ESPNetTest.test_label_path = sys.argv[3]
 
-    if (config.core.model_path is None) or (config.test_sample_path is None):
+    if (config.core.ESPNetTest.model_path is None) or (config.core.ESPNetTest.test_sample_path is None):
         helper = '''model_path or test_sample_path not found, please check:
-                config.core.model_path or sys.argv[1] to init model path
-                config.test_sample_path or sys.argv[2] to init test sample path
-                config.test_label_path or sys.argv[3] to init test sample path (not required)
+                config.core.ESPNetTest.model_path or sys.argv[1] to init model path
+                config.core.ESPNetTest.test_sample_path or sys.argv[2] to init test sample path
+                config.core.ESPNetTest.test_label_path or sys.argv[3] to init test sample path (not required)
                 for example:
                 python3 test.py <trained-model-path> <test sample path> [test label path(not required)]'''
         print(helper)
         sys.exit(1)
 
-    config.core.test_dataset = OsWalkBaseDataset(config, config.test_sample_path)
-    config.core.test_loader = torch.utils.data.DataLoader(config.core.test_dataset, batch_size=1, shuffle=False, num_workers=config.core.num_workers, pin_memory=True)
+    config.core.ESPNetTest.test_dataset = OsWalkBaseDataset(config, config.core.ESPNetTest.test_sample_path)
+    config.core.ESPNetTest.test_loader = torch.utils.data.DataLoader(config.core.ESPNetTest.test_dataset, batch_size=1, shuffle=False, num_workers=config.num_workers, pin_memory=True)
     ESPNetTest(config)()

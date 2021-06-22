@@ -154,3 +154,6 @@ scale4_train_loader = torch.utils.data.DataLoader(FileLineCvSegDataset(scale4_co
 scale4_train_loader.is_last_loader = False
 # multi loader
 config.core.ESPNetTrain.train_loader_list = [scale1_train_loader, scale2_train_loader, scale4_train_loader, scale3_train_loader, last_train_loader]
+
+config.core.ESPNetTest = config.core.ESPNetTrain.clone()
+config.core.ESPNetTest.model_reinterpret_cast = False
