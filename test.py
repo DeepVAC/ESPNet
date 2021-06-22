@@ -54,7 +54,7 @@ class ESPNetTest(Deepvac):
         cv2.imwrite(mask_savepath, classMap_numpy_color)
         LOG.logI('{}: [out cv image save to {}] [{}/{}]\n'.format(self.config.phase, savepath, self.config.test_step + 1, len(self.config.test_loader)))
 
-    def testFly(self):
+    def doTest(self):
         if self.config.test_loader:
             self.test()
             if self.config.test_label_path is None:
