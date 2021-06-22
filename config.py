@@ -12,9 +12,10 @@ from modules.model import EESPNet_Seg
 config = new('ESPNetTrain')
 ## -------------------- global ------------------
 config.sample_path = "your image path"
-config.cls_num = 2
+config.cls_num = 4
 config.mean = torch.Tensor([111.504555, 120.78698 , 128.28732]) / 255.
 config.std  = torch.Tensor([63.338905, 62.412697, 63.73896])
+config.classes_weight = torch.Tensor([1.5393538, 10.010507, 5.790331, 5.704213])
 
 ## -------------------- datasets & aug ------------------
 config.datasets.OsWalkDataset = AttrDict()
@@ -31,6 +32,7 @@ config.datasets.OsWalkBaseDataset.transform = trans.Compose([trans.ToPILImage(),
 
 ## ------------------ common ------------------
 config.core.ESPNetTrain.cls_num = config.cls_num
+config.core.ESPNetTrain.classes_weight = config.classes_weight
 config.core.ESPNetTrain.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 config.core.ESPNetTrain.output_dir = 'output'
 config.core.ESPNetTrain.show_output_dir = 'output/show'
@@ -70,3 +72,6 @@ config.num_workers = 6
 config.core.ESPNetTrain.train_dataset = OsWalkDataset(config, config.sample_path)
 config.core.ESPNetTrain.train_loader = torch.utils.data.DataLoader(config.core.ESPNetTrain.train_dataset, batch_size=1, num_workers=config.num_workers)
 
+
+config.core.ESPNetTest = config.core.ESPNetTrain.clone()
+config.core.ESPNetTest.model_reinterpret_cast = False
