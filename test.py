@@ -33,7 +33,7 @@ class ESPNetTest(Deepvac):
 
         cv_img = cv2.imread(self.config.filepath, 1)
         h, w = cv_img.shape[:2]
-        self.config.mask = cv2.resize(np.uint8(self.config.mask), (w, h), cv2.INTER_NEAREST)
+        self.config.mask = cv2.resize(np.uint8(self.config.mask), (w, h), interpolation=cv2.INTER_NEAREST)
 
         filename = self.config.filepath.split('/')[-1]
         mask_filename = filename + "_mask.png"
