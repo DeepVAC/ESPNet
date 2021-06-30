@@ -24,16 +24,17 @@ class ESPNetTest(Deepvac):
         self.config.filepath = self.config.target[0]
 
     def postIter(self):
-        self.config.output = self.config.output[0].squeeze().cpu().numpy()
+        cv_img = cv2.imread(self.config.filepath, 1)
+        h, w = cv_img.shape[:2]
+
+        self.config.output = F.interpolate(self.config.output[0], (h, w), mode="bilinear")
+        self.config.output = self.config.output.squeeze().cpu().numpy()
+
         if self.config.output.ndim == 2:
             self.config.mask = (self.config.output > 0.5)
         elif self.config.output.ndim == 3:
             self.config.mask = self.config.output.argmax(0)
         LOG.logI('{}: [output shape: {}] [{}/{}]'.format(self.config.phase, self.config.mask.shape, self.config.test_step + 1, len(self.config.test_loader)))
-
-        cv_img = cv2.imread(self.config.filepath, 1)
-        h, w = cv_img.shape[:2]
-        self.config.mask = cv2.resize(np.uint8(self.config.mask), (w, h), interpolation=cv2.INTER_NEAREST)
 
         filename = self.config.filepath.split('/')[-1]
         mask_filename = filename + "_mask.png"
